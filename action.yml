@@ -1,0 +1,54 @@
+name: "Fetch RPM from GitHub release"
+description: "Download an RPM asset from a GitHub release, matching the current architecture and a configurable regex."
+author: ""
+
+inputs:
+  release-url:
+    description: "Full GitHub release URL (e.g. https://github.com/owner/repo/releases/tag/v1.2.3). If set, repository/tag are auto-derived unless explicitly provided."
+    required: false
+  repository:
+    description: "GitHub repository in owner/repo format."
+    required: false
+  tag:
+    description: "Release tag. If omitted, latest release is used."
+    required: false
+  token:
+    description: "GitHub token used for API requests and private repositories."
+    required: false
+    default: ${{ github.token }}
+  asset-regex:
+    description: "Regex used to match release asset names. Supports {arch} placeholder."
+    required: false
+    default: "^(?!.*\\.src\\.rpm$).*{arch}.*\\.rpm$"
+  regex-flags:
+    description: "Regex flags for asset-regex (e.g. i, im)."
+    required: false
+    default: "i"
+  arch:
+    description: "Override architecture (e.g. x86_64, aarch64). Defaults to RUNNER_ARCH / Node architecture."
+    required: false
+  download-dir:
+    description: "Directory where the RPM should be downloaded."
+    required: false
+    default: "."
+  file-name:
+    description: "Output filename. Defaults to <repo>.rpm."
+    required: false
+
+outputs:
+  file-path:
+    description: "Absolute path to the downloaded RPM file."
+  asset-name:
+    description: "Original release asset name that was downloaded."
+  release-tag:
+    description: "Resolved release tag."
+  repository:
+    description: "Resolved repository in owner/repo format."
+  arch:
+    description: "Resolved normalized architecture."
+  matched-arch:
+    description: "Architecture token that matched the selected asset."
+
+runs:
+  using: "node24"
+  main: "dist/index.js"
